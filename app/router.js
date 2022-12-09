@@ -10,6 +10,10 @@ Router.map(function() {
   this.route('login');
   this.route('director-list');
   this.route('director', {path: 'director/:id'});
+
+  this.route('new', function() {
+    this.route('director');
+  });
 });
 
 export default Router;

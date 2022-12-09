@@ -1,22 +1,24 @@
 import Route from '@ember/routing/route';
-import config from '../config/environment';
 
 export default Route.extend({
   model() {
-    return this.getJSON(`${config.APP.backendUrl}/api/Directors`).then((d) => d);
+    return {
+      fio: null
+    }
   },
 
-  getJSON(url) {
+  postJSON(url, data) {
     return new Promise(function(resolve, reject){
       let xhr = new XMLHttpRequest();
       xhr.withCredentials = true;
 
-      xhr.open('GET', url);
+      xhr.open('POST', url);
       xhr.onreadystatechange = handler;
       xhr.responseType = 'json';
+      xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
       xhr.setRequestHeader('Accept', 'application/json');
       xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-      xhr.send();
+      xhr.send(data);
 
 
       function handler() {
@@ -32,12 +34,11 @@ export default Route.extend({
   },
 
   actions: {
-    clickRow(id) {
-      this.transitionTo(`director`, id);
-    },
-
-    createNew() {
-      this.transitionTo('new.director');
+    save() {
+      let model = this.get('controller.model');
+      this.postJSON('http://localhost:52006/api/Directors', JSON.stringify(model)).then(model => {
+        this.transitionTo('director', model.primarykey);
+      });
     }
   }
 });
